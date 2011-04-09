@@ -1,0 +1,19 @@
+\section{Beyond ``Hello World!''}
+
+The typical first program to write in any language is ``Hello, World!,'' and you can find many examples of tutorials that do just that. \marginal{Fix: \urlh{http://www.google.com}{Search Google for C, hello, world}.} What we want to do is someone real, as well as quick. Our first program will read text from the standard input port, collect statistics on the frequencies of letters in that text, and print the frequencies on the standard output port.
+
+Here is the program to do this:
+
+\scm{
+#include <map>#include <iostream>using namespace std;int main() 
+ {  map<char, int> freqs;   char ch;    while (cin .get(ch))    freqs[ch]++;   for (map<char,int>::iterator it = freqs.begin(); it != freqs.end(); it++) 
+  {    cout << it->first << "\t" << it->second << "\n";  }}
+}
+
+And here is the output from running the resulting program on this program code:
+
+\verb{
+	16 	55!	1"	4#	2(	6)	6+	4,	2-	2.	3/	2:	2;	8<	14=	2>	6[	1\	2]	1a	11b	1c	13d	5e	16f	7g	3h	7i	18l	3m	6n	13o	6p	4q	5r	13s	11t	17u	5w	1{	2}	2
+}
+
+Isn't that grand?

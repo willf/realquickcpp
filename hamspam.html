@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!-- Created by htmlize-0.67 in css mode. -->
+<html>
+  <head>
+    <title>hamspam.cpp</title>
+    <style type="text/css">
+    <!--
+      body {
+        color: #000000;
+        background-color: #ffffff;
+      } /* default */
+      .function-name {
+        color: #0000ff;
+        background-color: #ffffff;
+      } /* font-lock-function-name-face */
+      .type {
+        color: #228b22;
+        background-color: #ffffff;
+      } /* font-lock-type-face */
+      .variable-name {
+        color: #b8860b;
+        background-color: #ffffff;
+      } /* font-lock-variable-name-face */
+      .keyword {
+        color: #a020f0;
+        background-color: #ffffff;
+      } /* font-lock-keyword-face */
+      .string {
+        color: #bc8f8f;
+        background-color: #ffffff;
+      } /* font-lock-string-face */
+      .builtin {
+        color: #da70d6;
+        background-color: #ffffff;
+      } /* font-lock-builtin-face */
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+    <pre>
+#<span class="builtin">include</span> <span class="string">&lt;iostream&gt;</span>
+#<span class="builtin">include</span> <span class="string">&quot;UnigramTextClassifier.h&quot;</span> 
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="variable-name">std</span>;
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="variable-name">TextClassifier</span>;
+
+<span class="type">int</span> <span class="function-name">main</span>(<span class="type">int</span> <span class="variable-name">argc</span>,<span class="type">char</span> *<span class="variable-name">argv</span>[]) 
+{ 
+  UnigramTextClassifier ham = UnigramTextClassifier();
+  UnigramTextClassifier spam = UnigramTextClassifier();
+  ham.read(argv[1]);
+  spam.read(argv[2]);
+  <span class="type">int</span> <span class="variable-name">hams</span> = 0;
+  <span class="type">int</span> <span class="variable-name">spams</span> = 0;
+  <span class="type">int</span> <span class="variable-name">total</span> = 0;
+  <span class="keyword">for</span> (<span class="type">int</span> <span class="variable-name">i</span>=3; i&lt;argc; i++)
+    {
+      total++; 
+      <span class="keyword">if</span> (ham.score(argv[i]) &gt; spam.score(argv[i])) 
+	hams++;
+      <span class="keyword">else</span>  
+	spams++;
+    }
+  cout &lt;&lt; <span class="string">&quot;\nTotal: &quot;</span> &lt;&lt; total &lt;&lt; <span class="string">&quot; Ham: &quot;</span> &lt;&lt; hams &lt;&lt; <span class="string">&quot; Spam: &quot;</span> &lt;&lt; spams &lt;&lt; endl;
+}
+</pre>
+  </body>
+</html>

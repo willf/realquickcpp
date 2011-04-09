@@ -1,0 +1,668 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta name="generator" content=
+"HTML Tidy for Mac OS X (vers 1st July 2002), see www.w3.org">
+<title>Real Quick C++: C++ Classes, and Real Quick software
+development</title>
+<link rel="stylesheet" type="text/css" href="realquick.css" title=
+"default">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<div align="right" class="navigation">[Go to <a href=
+"realquickcpp.html">first</a>, <a href=
+"classesetal.html">previous</a>, <a href="memorymgt.html">next</a>
+page;&nbsp;<a href="realquickcpp.html">contents</a>]</div>
+
+<h1>C++ Classes, and Real Quick software development</h1>
+
+<p>C++ is "C with classes." To explore C++ classes, as well as do a
+little software engineering, our second "real, quick" program will
+be a simple text classification tool that could be used, for
+example, to distinguish between "spam" (unwanted email) and "ham"
+(email we want). The basic idea is that texts from different
+classifications will have different character frequency
+characteristics (spam email from sex-sites might have lots of "x's"
+in them, for example). First, we'll train our text classifier on
+texts which have been marked as which class they belong too (We'll
+call this program <b>ilearn</b>, for "information-based learning").
+Second, we'll test our classifier by seeing if it can distinguish
+between ham and spam. We'll call this program <b>hamspam</b>.</p>
+
+<p>Here are the programs in action. We train the classifiers on
+files in ham and spam directories, and then test them on files in
+separate directories:</p>
+
+<pre class="codeBlock">
+<span class="comint-highlight-prompt">%</span> <span class=
+"comint-highlight-input">cat /ham/ham.0/* | ilearn Ham &gt; ham.txt</span>
+<span class="comint-highlight-prompt">%</span> <span class=
+"comint-highlight-input">cat /spam/spam.0/* | ilearn Spam &gt; spam.txt</span>
+<span class="comint-highlight-prompt">%</span> <span class=
+"comint-highlight-input">hamspam ham.txt spam.txt /ham/ham.1/*</span>
+Total: 500 Ham: 497 Spam: 3
+<span class="comint-highlight-prompt">%</span> <span class=
+"comint-highlight-input">hamspam ham.txt spam.txt /spam/spam.1/*</span>
+Total: 500 Ham: 244 Spam: 256
+</pre>
+
+<p>The spam filter is about 50% effective, and only occasionally
+mis-classifies a real email as a piece of spam. This is somewhat
+impressive for something so simple. Not impressive enough to use on
+a day-to-day basis, perhaps, but impressive enough.</p>
+
+<h2>A (very) little modeling</h2>
+
+<p>Given the example above, a text classifier needs at least two
+methods: a <b>learn</b> method (for training the classifier) and
+some kind of <b>score</b> method that will score a text against
+what it's learned. It would also be useful to <b>dump</b> training
+data and <b>read</b> it back again. Because we're basing our
+classifier on single characters ("unigrams"), we'll call the class
+<span class="variable-name">UnigramTextClassifier</span>.</p>
+
+<p>Here is the code for <b>hamspam.cpp</b>:</p>
+
+<pre class="codeBlock">
+#<span class="builtin">include</span> <span class=
+"string">&lt;iostream&gt;</span>
+#<span class="builtin">include</span> <span class=
+"string">"UnigramTextClassifier.h"</span> 
+
+<span class="keyword">using</span> <span class=
+"keyword">namespace</span> <span class="variable-name">std</span>;
+<span class="keyword">using</span> <span class=
+"keyword">namespace</span> <span class="variable-name">TextClassifier</span>;
+
+<span class="type">int</span> <span class=
+"function-name">main</span>(<span class="type">int</span> <span
+class="variable-name">argc</span>,<span class=
+"type">char</span> *<span class="variable-name">argv</span>[]) 
+{ 
+  UnigramTextClassifier ham = UnigramTextClassifier();
+  UnigramTextClassifier spam = UnigramTextClassifier();
+  ham.read(argv[1]);
+  spam.read(argv[2]);
+  <span class="type">int</span> <span class=
+"variable-name">hams</span> = 0;
+  <span class="type">int</span> <span class=
+"variable-name">spams</span> = 0;
+  <span class="type">int</span> <span class=
+"variable-name">total</span> = 0;
+  <span class="keyword">for</span> (<span class=
+"type">int</span> <span class=
+"variable-name">i</span>=3; i&lt;argc; i++)
+    {
+      total++; 
+      <span class=
+"keyword">if</span> (ham.score(argv[i]) &gt; spam.score(argv[i])) 
+        hams++;
+      <span class="keyword">else</span>  
+        spams++;
+    }
+  cout &lt;&lt; <span class=
+"string">"\nTotal: "</span> &lt;&lt; total &lt;&lt; <span class=
+"string">" Ham: "</span> &lt;&lt; hams &lt;&lt; <span class=
+"string">" Spam: "</span> &lt;&lt; spams &lt;&lt; endl;
+}
+</pre>
+
+<p>In addition to the #<span class="builtin">include</span> <span
+class="string">&lt;iostream&gt;</span> statement, there is this
+statement: #<span class="builtin">include</span> <span class=
+"string">"UnigramTextClassifier.h"</span>. It is standard, in
+writing C++ programs, to place function and class declarations in a
+separate file so that the program linker knows how to link object
+files together. When the #<span class="builtin">include</span>d
+file is given in double quotation marks, the definitions are looked
+for locally (usually in the same directory). We'll get to the
+definitions soon; we are seeing how these definitions are used in
+new programs.</p>
+
+<div class="callout">A "C-style string" is an array of bytes, the
+last byte containing a 0. C++ also has, as we have seen, its own
+string type.</div>
+
+<p>The <span class="function-name">main</span> function, in this
+case, has two arguments, <span class="variable-name">argc</span>
+and <span class="variable-name">argv</span>. The variable <span
+class="variable-name">argc</span> contains the number of arguments
+given; it is at least 1 (because the program name is considered an
+argument). The variable <span class="variable-name">argv</span> is
+an array of C-style strings which are the arguments (the zeroth
+string is the program name).</p>
+
+<p>In our short program, which does no error checking, <span class=
+"variable-name">argv[1]</span> is the filename for the dumped ham
+frequencies, and <span class="variable-name">argv[2]</span> is the
+filename for the dumped spam frequencies. The remaining entries in
+<span class="variable-name">argv</span> (that is, from 3 to <span
+class="variable-name">argc</span>-1), contain filenames to check.
+For each file, if the score of the ham classifier is greater than
+the spam classifier, the number of purported ham files is
+incremented; otherwise the number of purported spam files is
+incremented. After all the files are processed, the totals are
+printed.</p>
+
+<h2>Heads will roll</h2>
+
+<p>The contents of a header file for a class contain the methods
+and data members of the class. Here's the header file for
+UnigramTextClassifier. There are a few things of note to start
+with: notice how some blocks are declared <span class=
+"keyword">public</span> and others <span class=
+"keyword">private</span> (I tend to follow the convention that data
+members should always be private and accessed through methods).
+Also notice that the class block <i>ends in a semi-colon</i>;
+leaving this out is a standard novice mistake.</p>
+
+<pre class="codeBlock">
+#<span class="builtin">ifndef</span> <span class=
+"variable-name">UnigramTextClassifier_H</span>
+#<span class="builtin">define</span> <span class=
+"variable-name">UnigramTextClassifier_H</span>
+#<span class="builtin">include</span> <span class=
+"string">&lt;map&gt;</span>
+#<span class="builtin">include</span> <span class=
+"string">&lt;iostream&gt;</span>
+#<span class="builtin">include</span> <span class=
+"string">&lt;fstream&gt;</span>
+
+<span class="type">namespace</span> <span class=
+"variable-name">TextClassifier</span> 
+{
+  <span class="keyword">typedef</span> map&lt;<span class=
+"type">unsigned</span> <span class="type">char</span>,<span class=
+"type">unsigned</span> <span class=
+"type">long</span>&gt; frequency_map;
+  class UnigramTextClassifier 
+  {
+  <span class="constant">public</span>:
+    UnigramTextClassifier();
+    UnigramTextClassifier(<span class=
+"keyword">const</span> string classification);
+
+    frequency_map freqs() { <span class=
+"keyword">return</span> my_freqs; }
+    <span class="type">unsigned</span> <span class=
+"type">long</span> <span class=
+"function-name">corpus_total</span>() { <span class=
+"keyword">return</span> my_corpus_total; }
+    <span class="type">unsigned</span> <span class=
+"type">long</span> <span class=
+"function-name">total</span>() { <span class=
+"keyword">return</span> my_total; }
+    string classification() { <span class=
+"keyword">return</span> my_classification; }
+    <span class="type">void</span> <span class=
+"function-name">setClassification</span>(string&amp; classification) {my_classification = classification;}
+
+    <span class="type">void</span> <span class=
+"variable-name">UnigramTextClassifier</span>::learn(istream&amp; in);
+    <span class="type">void</span> <span class=
+"variable-name">UnigramTextClassifier</span>::learn(<span class=
+"type">char</span>* <span class="variable-name">in</span>);
+    
+    <span class="type">void</span> <span class=
+"variable-name">UnigramTextClassifier</span>::dump(ostream&amp; out);
+    <span class="type">void</span> <span class=
+"variable-name">UnigramTextClassifier</span>::dump(<span class=
+"type">char</span>* <span class="variable-name">out</span>);
+
+    <span class="type">void</span> <span class=
+"variable-name">UnigramTextClassifier</span>::read(istream&amp; in);
+    <span class="type">void</span> <span class=
+"variable-name">UnigramTextClassifier</span>::read(<span class=
+"type">char</span>* <span class="variable-name">in</span>);
+  
+    <span class="type">float</span> <span class=
+"variable-name">UnigramTextClassifier</span>::score(istream&amp; in); 
+    <span class="type">float</span> <span class=
+"variable-name">UnigramTextClassifier</span>::score(<span class=
+"type">char</span>* <span class="variable-name">in</span>) ;
+     
+    <span class="type">float</span> <span class=
+"variable-name">UnigramTextClassifier</span>::bits_required(<span
+class="type">unsigned</span> <span class="type">char</span> <span
+class="variable-name">ch</span>);
+    <span class="type">float</span> <span class=
+"variable-name">UnigramTextClassifier</span>::bits_required(istream&amp; in);
+    <span class="type">float</span> <span class=
+"variable-name">UnigramTextClassifier</span>::bits_required(<span
+class="type">char</span>* <span class="variable-name">in</span>);
+  <span class="constant">private</span>:
+    <span class=
+"comment">/* internal character-&gt;frequency map */</span>
+    frequency_map my_freqs;
+    <span class=
+"comment">/* internal total number of characters in corpus */</span>
+    <span class="type">unsigned</span> <span class=
+"type">long</span> <span class=
+"variable-name">my_corpus_total</span>;
+    <span class=
+"comment">/* internal total number of characters in text */</span>
+    <span class="type">unsigned</span> <span class=
+"type">long</span> <span class="variable-name">my_total</span>;
+    <span class="comment">/* internal name of classifer */</span>
+    string my_classification;
+    <span class="comment">/* internal base-2 logarithm */</span>
+    <span class="type">float</span> <span class=
+"variable-name">UnigramTextClassifier</span>::lg (<span class=
+"type">float</span> <span class="variable-name">n</span>);
+    <span class=
+"comment">/* internal information value function -lg(n) */</span>
+    <span class="type">float</span> <span class=
+"variable-name">UnigramTextClassifier</span>::info_value(<span
+class="type">float</span> <span class="variable-name">n</span>);
+    <span class="comment">/* internal current time stream */</span>
+    string UnigramTextClassifier::ctime_string();
+  };
+}
+<span class="type">using</span> namespace <span class=
+"variable-name">std</span>;
+
+#<span class="builtin">endif</span> <span class=
+"comment">/* UnigramTextClassifier_H_ */</span>
+</pre>
+
+<p>Four other things of note:</p>
+
+<ol>
+<li>The file starts with #<span class="builtin">ifndef</span> <span
+class="variable-name">UnigramTextClassifier_H</span> #<span class=
+"builtin">define</span> <span class=
+"variable-name">UnigramTextClassifier_H</span>. and ends in #<span
+class="builtin">endif</span>. These are macro directives. In
+general, it's a good idea to avoid the macro system in C++ (in my
+opinion, anyway). But one place they are crucial is in header
+files, and the statements in this example are a paradigmatic case.
+If there's any chance that the header will be included twice, these
+macros ensure the text between #<span class="builtin">ifndef</span>
+("if not defined") and the end is not reread by the compiler.
+Similarly, the <span class="variable-name">TextClassifier</span> namespace is
+wrapped around the class header to declare a special namespace (which
+we <span class="builtin">use</span> in the hamspam program).</li>
+
+<li>Some of the methods--the really short ones--are defined right
+in the header. When a class method is defined in the #<span class=
+"builtin">class</span> block, it is defined in line, resulting in
+(theoretically) faster code. One standard is to define the field
+accessors in this way, and that is what this code does. I've used
+the convention of defining the private fields as starting with an
+"my" (for example, <b>string my_classification</b>.</li>
+
+<li>Notice that C++ can have the same method name with different
+method parameters. I provide methods for a filename and a stream
+for the basic operations we defined above.</li>
+
+<li>There isn't much documentation shown above. In fact, I
+recommend using <a href=
+"http://www.stack.nl/~dimitri/doxygen/index.html">Doxygen</a> for
+code documentation. You'll need to see the Doxygen documentation
+for details, but see also the <a href=
+"doc/html/classstd_1_1_unigram_text_classifier.html">UnigramTextClassifier
+documentation</a> Doxygen created for a sample.</li>
+</ol>
+
+<h2>Class walfare</h2>
+
+<p>Given this header file, what does the class code look like?
+Here's the code: it's not very trickly code.</p>
+
+<pre class="codeBlock">
+#<span class="builtin">include</span> <span class=
+"string">&lt;time.h&gt;</span>
+#<span class="builtin">include</span> <span class=
+"string">"UnigramTextClassifier.h"</span> 
+
+<span class="keyword">using</span> <span class=
+"keyword">namespace</span> <span class="variable-name">std</span>;
+
+<span class="type">UnigramTextClassifier</span>::<span class=
+"function-name">UnigramTextClassifier</span>() 
+{
+  my_total = 0;
+  my_corpus_total = 0;
+  my_classification = <span class="string">"Unknown"</span>; 
+}
+
+
+<span class="type">UnigramTextClassifier</span>::<span class=
+"function-name">UnigramTextClassifier</span>(<span class=
+"keyword">const</span> <span class="type">string</span> <span
+class="variable-name">classification</span>) 
+{
+  my_total = 0;
+  my_corpus_total = 0;
+  my_classification = classification; 
+}
+
+<span class="type">void</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">learn</span>(<span class=
+"type">istream</span>&amp; <span class="variable-name">in</span>)
+{
+  <span class="type">char</span> <span class=
+"variable-name">ch</span>; <span class=
+"comment">// note: in.get requires char, not unsigned char
+</span>  <span class="keyword">while</span> (in.get(ch))
+    {
+      my_freqs[ch]++;
+      my_corpus_total++;
+    }
+}
+
+<span class="type">void</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">learn</span>(<span class="type">char</span>* <span
+class="variable-name">fname</span>)
+{
+  <span class="type">ifstream</span> <span class=
+"variable-name">instr</span>(fname);
+  learn(instr);
+  instr.close();
+}
+
+<span class="type">void</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">dump</span>(<span class=
+"type">ostream</span>&amp; <span class="variable-name">out</span>) 
+{
+  frequency_map m = <span class="keyword">this</span>-&gt;freqs();
+  <span class="type">long</span> <span class=
+"variable-name">tot</span> = <span class=
+"keyword">this</span>-&gt;corpus_total();
+  out &lt;&lt; <span class=
+"string">"// UnigramTextClassifier created this file from "</span> &lt;&lt; tot
+       &lt;&lt; <span class=
+"string">" characters. It was created on "</span> + ctime_string() &lt;&lt; <span
+ class="string">".\n"</span>;
+  out &lt;&lt; <span class=
+"string">"Classification\t"</span> &lt;&lt; <span class=
+"keyword">this</span>-&gt;classification() &lt;&lt; endl;
+  out &lt;&lt; <span class=
+"string">"Total\t"</span> &lt;&lt; tot &lt;&lt; endl;
+  <span class="keyword">for</span> (frequency_map::<span class=
+"type">iterator</span> <span class=
+"variable-name">it</span>=m.begin(); it != m.end(); it++) 
+    {
+      out &lt;&lt; (<span class="type">unsigned</span> <span class=
+"type">int</span>)it-&gt;first &lt;&lt; <span class=
+"string">"\t"</span> &lt;&lt; it-&gt;second &lt;&lt; <span class=
+"string">"\t"</span> 
+          &lt;&lt; info_value((<span class=
+"type">float</span>)(it-&gt;second)/tot) &lt;&lt; endl;
+    }
+}
+
+<span class="type">void</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">dump</span>(<span class="type">char</span>* <span
+class="variable-name">fname</span>)
+{
+  <span class="type">ofstream</span> <span class=
+"variable-name">instr</span>(fname);
+  dump(instr);
+  instr.close();
+}
+
+<span class="type">void</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">read</span>(<span class=
+"type">istream</span>&amp; <span class="variable-name">in</span>)
+{
+  
+  <span class="type">string</span> <span class=
+"variable-name">classification</span>; 
+  <span class="type">unsigned</span> <span class=
+"type">char</span> <span class="variable-name">ch</span>; 
+  <span class="type">long</span> <span class=
+"variable-name">frequency</span>;
+  <span class="type">char</span> <span class=
+"variable-name">text</span>[256];
+  in.getline(text,256,<span class="string">'\n'</span>);  <span
+class="comment">// throw away first line
+</span>  in.getline(text,256,<span class=
+"string">'\t'</span>); <span class="comment">// ignore class header
+</span>  <span class=
+"variable-name">in</span>.getline(text,256,<span class=
+"string">'\n'</span>); <span class="comment">// get class
+</span>  <span class="variable-name">classification</span> = (<span
+class="type">string</span>)text;
+  <span class=
+"keyword">this</span>-&gt;setClassification(classification);
+  in.getline(text,256); <span class=
+"comment">// throw away 'total' line
+</span>  
+  <span class="keyword">while</span> (<span class=
+"constant">true</span>)
+    {
+      in.getline(text,256,<span class="string">'\t'</span>); 
+      <span class="keyword">if</span> (text[0]==0) <span class=
+"keyword">break</span>;
+      ch = (<span class="type">unsigned</span> <span class=
+"type">char</span>)atoi(text);
+      in.getline(text,256,<span class="string">'\t'</span>);
+      frequency = atol(text);
+      my_freqs[ch] = frequency;
+      my_corpus_total+= frequency;
+      in.getline(text,256); <span class=
+"comment">// ignore rest of line
+</span>    }
+}
+
+
+<span class="type">void</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">read</span>(<span class="type">char</span>* <span
+class="variable-name">fname</span>)
+{
+  <span class="type">ifstream</span> <span class=
+"variable-name">instr</span>(fname);
+  read(instr);
+  instr.close();
+}
+
+<span class="type">float</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">score</span> (<span class=
+"type">istream</span>&amp; <span class="variable-name">in</span>) 
+{
+  <span class="type">float</span> <span class=
+"variable-name">br</span> = bits_required(in);
+  <span class="type">long</span> <span class=
+"variable-name">tot</span> = total()*8;
+  <span class="type">float</span> <span class=
+"variable-name">sc</span> = 1 - br/tot;
+  <span class="keyword">return</span> (sc &gt;= 0 ? sc : 0.0) ;
+}
+
+<span class="type">float</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">score</span>(<span class="type">char</span>* <span
+class="variable-name">fname</span>)
+{
+  <span class="type">ifstream</span> <span class=
+"variable-name">instr</span>(fname);
+  <span class="keyword">return</span> score(instr);
+  instr.close();
+}
+
+
+<span class="type">float</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">bits_required</span>(<span class=
+"type">unsigned</span> <span class="type">char</span> <span class=
+"variable-name">ch</span>) 
+{
+  frequency_map m = <span class="keyword">this</span>-&gt;freqs();
+  <span class="type">long</span> <span class=
+"variable-name">tot</span> = <span class=
+"keyword">this</span>-&gt;corpus_total();
+  <span class="type">long</span> <span class=
+"variable-name">frequency</span> = ((!m[ch]) ? 1 : m[ch]) ;
+  <span class="keyword">return</span> info_value((<span class=
+"type">float</span>)frequency/tot);
+}
+
+<span class="type">float</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">bits_required</span>(<span class=
+"type">istream</span>&amp; <span class="variable-name">in</span>)
+{
+  <span class="type">char</span> <span class=
+"variable-name">ch</span>; <span class=
+"comment">// note: in.get requires char, not unsigned char
+</span>  <span class="type">float</span> <span class=
+"variable-name">bits</span> = 0;
+  frequency_map tfreq; 
+  <span class="comment">// count the frequencies in this text
+</span>  <span class="keyword">while</span> (in.get(ch))
+    {
+      tfreq[(<span class="type">unsigned</span> <span class=
+"type">char</span>)ch]++;
+      my_total++;
+    }
+  <span class=
+"comment">// iterate through the temp map adding bits * frequency
+</span>  <span class="keyword">for</span> (frequency_map::<span
+class="type">iterator</span> <span class=
+"variable-name">it</span>=tfreq.begin(); it != tfreq.end(); it++) 
+    {
+      bits += bits_required(it-&gt;first) * it-&gt;second;
+    }
+  <span class="keyword">return</span> bits;
+}
+
+<span class="type">float</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">bits_required</span>(<span class=
+"type">char</span>* <span class="variable-name">fname</span>)
+{
+  <span class="type">ifstream</span> <span class=
+"variable-name">instr</span>(fname);
+  <span class="keyword">return</span> bits_required(instr);
+  instr.close();
+}
+
+<span class="type">float</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">lg</span>(<span class="type">float</span> <span
+class="variable-name">n</span>) 
+{
+  <span class="keyword">const</span> <span class=
+"type">float</span> <span class=
+"variable-name">log2</span> = log(2.0);
+  <span class="keyword">return</span> log(n)/log2;
+}
+
+<span class="type">float</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">info_value</span>(<span class=
+"type">float</span> <span class="variable-name">n</span>) 
+{
+  <span class="keyword">return</span> -lg(n);
+}
+
+<span class="type">string</span> <span class=
+"type">UnigramTextClassifier</span>::<span class=
+"function-name">ctime_string</span>() 
+{
+  <span class="type">time_t</span> <span class=
+"variable-name">rawtime</span>;
+  <span class="keyword">struct</span> <span class=
+"type">tm</span> * <span class="variable-name">timeinfo</span>;
+  time (&amp;rawtime);
+  timeinfo = localtime(&amp;rawtime);
+  <span class="type">char</span> <span class=
+"variable-name">tmpbuf</span>[128];
+  strftime(tmpbuf,128,<span class=
+"string">"%Y-%m-%d %H:%M:%S"</span>,timeinfo);
+  <span class="keyword">return</span> <span class=
+"type">string</span>(tmpbuf);
+}
+
+</pre>
+
+<p>Here are the tricky bits:</p>
+
+<ol>
+<li>Standard character input and output facilities are relatively
+primitive. My program wants to intrepret a character as an 8-bit,
+unsigned byte (which is what the type <span class="type">unsigned
+char</span> guarantees. It's easy enough to cast a signed <span
+class="type">char</span> to unsigned. In the data file, I put out
+the <span class="type">integer</span> value of the character, its
+frequency, and the number of bits require. When reading the data
+back in, I ignore the bits required because they're not necessary
+(but they are nice to see in the output file). The ugliest pieces
+of code here, to my mind, is the code dealing with input and
+output. For example, the <span class="function">getline</span>
+method for streams requires you to guess at how large a string
+you'll need to read in.</li>
+
+<li>The <span class="function">score</span> method essentially
+returns the ideal percentage of compression achievable given the
+frequencies in the corpus text and the text to be scored. Since
+it's possible for the number of bits required to encode a text to
+actually be <i>larger</i> than encoding it with just 8-bit bytes,
+the <span class="function">score</span> method returns 0 in this
+case. Thus, we get a nice score that ranges from 0.0 to 1.0.</li>
+
+<li>For what it's worth, when I originally wrote the <span class=
+"">bits_required</span> method, I calculated a running bit total on
+each character. Later, I rewrote this to count the frequencies
+first, and then run through the (up to) 256 frequencies to calcuate
+the bit total. This was over 10 times faster--as usual, integer
+arithmetic is faster than floating point arithmetic. (Note also
+that the I assume that the frequency in the corpus is at least 1.
+Otherwise, it would require an infinite number of bits to
+encode!)</li>
+</ol>
+
+<h2><span class="keyword">Make</span> me an offer I can't
+refuse</h2>
+
+I compiled these programs under <a href=
+"http://gcc.gnu.org/">G++</a>, the C++ compiler from the Free
+Software Foundation. I also used <a href=
+"http://www.gnu.org/software/make/make.html">GNU Make</a> to do
+incremental compilation. A discussion of make is beyond this
+tutorial, but here is the Makefile I used: 
+<pre class="codeBase">
+<span class="variable-name">CC</span> = g++
+<span class="variable-name">CFLAGS</span> = -Wall -g
+
+<span class="function-name">all</span>: ilearn hamspam  doc
+
+<span class=
+"function-name">UnigramTextClassifier.o</span>:     UnigramTextClassifier.h UnigramTextClassifier.cpp
+        $(<span class="constant">CC</span>) $(<span class=
+"constant">CFLAGS</span>) -c UnigramTextClassifier.cpp
+
+<span class=
+"function-name">ilearn</span>:      UnigramTextClassifier.o ilearn.cpp
+        $(<span class="constant">CC</span>) $(<span class=
+"constant">CFLAGS</span>) UnigramTextClassifier.o ilearn.cpp -o ilearn
+
+<span class=
+"function-name">hamspam</span>:     UnigramTextClassifier.o hamspam.cpp
+        $(<span class="constant">CC</span>) $(<span class=
+"constant">CFLAGS</span>) UnigramTextClassifier.o hamspam.cpp -o hamspam
+
+<span class="function-name">clean</span>:
+        rm -f core *.o *~
+
+<span class=
+"function-name">doc</span>: UnigramTextClassifier.h doxygen.cfg
+        doxygen doxygen.cfg
+</pre>
+
+<div align="right" class="navigation">[Go to <a href=
+"realquickcpp.html">first</a>, <a href=
+"classesetal.html">previous</a>, <a href="memorymgt.html">next</a>
+page;&nbsp;<a href="realquickcpp.html">contents</a>]</div>
+</body>
+</html>
+

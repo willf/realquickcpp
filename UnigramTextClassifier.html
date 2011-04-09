@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!-- Created by htmlize-0.67 in css mode. -->
+<html>
+  <head>
+    <title>UnigramTextClassifier.cpp</title>
+    <style type="text/css">
+    <!--
+      body {
+        color: #000000;
+        background-color: #ffffff;
+      } /* default */
+      .constant {
+        color: #5f9ea0;
+        background-color: #ffffff;
+      } /* font-lock-constant-face */
+      .comment {
+        color: #b22222;
+        background-color: #ffffff;
+      } /* font-lock-comment-face */
+      .function-name {
+        color: #0000ff;
+        background-color: #ffffff;
+      } /* font-lock-function-name-face */
+      .type {
+        color: #228b22;
+        background-color: #ffffff;
+      } /* font-lock-type-face */
+      .variable-name {
+        color: #b8860b;
+        background-color: #ffffff;
+      } /* font-lock-variable-name-face */
+      .keyword {
+        color: #a020f0;
+        background-color: #ffffff;
+      } /* font-lock-keyword-face */
+      .string {
+        color: #bc8f8f;
+        background-color: #ffffff;
+      } /* font-lock-string-face */
+      .builtin {
+        color: #da70d6;
+        background-color: #ffffff;
+      } /* font-lock-builtin-face */
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+    <pre>
+#<span class="builtin">include</span> <span class="string">&lt;time.h&gt;</span>
+#<span class="builtin">include</span> <span class="string">&quot;UnigramTextClassifier.h&quot;</span> 
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="variable-name">std</span>;
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="variable-name">TextClassifier</span>;
+
+<span class="type">UnigramTextClassifier</span>::<span class="function-name">UnigramTextClassifier</span>() 
+{
+  my_total = 0;
+  my_corpus_total = 0;
+  my_classification = <span class="string">&quot;Unknown&quot;</span>; 
+}
+
+
+<span class="type">UnigramTextClassifier</span>::<span class="function-name">UnigramTextClassifier</span>(<span class="keyword">const</span> <span class="type">string</span> <span class="variable-name">classification</span>) 
+{
+  my_total = 0;
+  my_corpus_total = 0;
+  my_classification = classification; 
+}
+
+<span class="type">void</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">learn</span>(<span class="type">istream</span>&amp; <span class="variable-name">in</span>)
+{
+  <span class="type">char</span> <span class="variable-name">ch</span>; <span class="comment">// note: in.get requires char, not unsigned char
+</span>  <span class="keyword">while</span> (in.get(ch))
+    {
+      my_freqs[ch]++;
+      my_corpus_total++;
+    }
+}
+
+<span class="type">void</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">learn</span>(<span class="type">char</span>* <span class="variable-name">fname</span>)
+{
+  <span class="type">ifstream</span> <span class="variable-name">instr</span>(fname);
+  learn(instr);
+  instr.close();
+}
+
+<span class="type">void</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">dump</span>(<span class="type">ostream</span>&amp; <span class="variable-name">out</span>) 
+{
+  frequency_map m = <span class="keyword">this</span>-&gt;freqs();
+  <span class="type">long</span> <span class="variable-name">tot</span> = <span class="keyword">this</span>-&gt;corpus_total();
+  out &lt;&lt; <span class="string">&quot;// UnigramTextClassifier created this file from &quot;</span> &lt;&lt; tot
+       &lt;&lt; <span class="string">&quot; characters. It was created on &quot;</span> + ctime_string() &lt;&lt; <span class="string">&quot;.\n&quot;</span>;
+  out &lt;&lt; <span class="string">&quot;Classification\t&quot;</span> &lt;&lt; <span class="keyword">this</span>-&gt;classification() &lt;&lt; endl;
+  out &lt;&lt; <span class="string">&quot;Total\t&quot;</span> &lt;&lt; tot &lt;&lt; endl;
+  <span class="keyword">for</span> (frequency_map::<span class="type">iterator</span> <span class="variable-name">it</span>=m.begin(); it != m.end(); it++) 
+    {
+      out &lt;&lt; (<span class="type">unsigned</span> <span class="type">int</span>)it-&gt;first &lt;&lt; <span class="string">&quot;\t&quot;</span> &lt;&lt; it-&gt;second &lt;&lt; <span class="string">&quot;\t&quot;</span> 
+	  &lt;&lt; info_value((<span class="type">float</span>)(it-&gt;second)/tot) &lt;&lt; endl;
+    }
+}
+
+<span class="type">void</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">dump</span>(<span class="type">char</span>* <span class="variable-name">fname</span>)
+{
+  <span class="type">ofstream</span> <span class="variable-name">instr</span>(fname);
+  dump(instr);
+  instr.close();
+}
+
+<span class="type">void</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">read</span>(<span class="type">istream</span>&amp; <span class="variable-name">in</span>)
+{
+  
+  <span class="type">string</span> <span class="variable-name">classification</span>; 
+  <span class="type">unsigned</span> <span class="type">char</span> <span class="variable-name">ch</span>; 
+  <span class="type">long</span> <span class="variable-name">frequency</span>;
+  <span class="type">char</span> <span class="variable-name">text</span>[256];
+  in.getline(text,256,<span class="string">'\n'</span>);  <span class="comment">// throw away first line
+</span>  in.getline(text,256,<span class="string">'\t'</span>); <span class="comment">// ignore class header
+</span>  <span class="variable-name">in</span>.getline(text,256,<span class="string">'\n'</span>); <span class="comment">// get class
+</span>  <span class="variable-name">classification</span> = (<span class="type">string</span>)text;
+  <span class="keyword">this</span>-&gt;setClassification(classification);
+  in.getline(text,256); <span class="comment">// throw away 'total' line
+</span>  
+  <span class="keyword">while</span> (<span class="constant">true</span>)
+    {
+      in.getline(text,256,<span class="string">'\t'</span>); 
+      <span class="keyword">if</span> (text[0]==0) <span class="keyword">break</span>;
+      ch = (<span class="type">unsigned</span> <span class="type">char</span>)atoi(text);
+      in.getline(text,256,<span class="string">'\t'</span>);
+      frequency = atol(text);
+      my_freqs[ch] = frequency;
+      my_corpus_total+= frequency;
+      in.getline(text,256); <span class="comment">// ignore rest of line
+</span>    }
+}
+
+
+<span class="type">void</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">read</span>(<span class="type">char</span>* <span class="variable-name">fname</span>)
+{
+  <span class="type">ifstream</span> <span class="variable-name">instr</span>(fname);
+  read(instr);
+  instr.close();
+}
+
+<span class="type">float</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">score</span> (<span class="type">istream</span>&amp; <span class="variable-name">in</span>) 
+{
+  <span class="type">float</span> <span class="variable-name">br</span> = bits_required(in);
+  <span class="type">long</span> <span class="variable-name">tot</span> = total()*8;
+  <span class="type">float</span> <span class="variable-name">sc</span> = 1 - br/tot;
+  <span class="keyword">return</span> (sc &gt;= 0 ? sc : 0.0) ;
+}
+
+<span class="type">float</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">score</span>(<span class="type">char</span>* <span class="variable-name">fname</span>)
+{
+  <span class="type">ifstream</span> <span class="variable-name">instr</span>(fname);
+  <span class="type">float</span> <span class="variable-name">sc</span> = score(instr);
+  instr.close();
+  <span class="keyword">return</span> sc;
+}
+
+
+<span class="type">float</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">bits_required</span>(<span class="type">unsigned</span> <span class="type">char</span> <span class="variable-name">ch</span>) 
+{
+  frequency_map m = <span class="keyword">this</span>-&gt;freqs();
+  <span class="type">long</span> <span class="variable-name">tot</span> = <span class="keyword">this</span>-&gt;corpus_total();
+  <span class="type">long</span> <span class="variable-name">frequency</span> = ((!m[ch]) ? 1 : m[ch]) ;
+  <span class="keyword">return</span> info_value((<span class="type">float</span>)frequency/tot);
+}
+
+<span class="type">float</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">bits_required</span>(<span class="type">istream</span>&amp; <span class="variable-name">in</span>)
+{
+  <span class="type">char</span> <span class="variable-name">ch</span>; <span class="comment">// note: in.get requires char, not unsigned char
+</span>  <span class="type">float</span> <span class="variable-name">bits</span> = 0;
+  frequency_map tfreq; 
+  <span class="comment">// count the frequencies in this text
+</span>  <span class="keyword">while</span> (in.get(ch))
+    {
+      tfreq[(<span class="type">unsigned</span> <span class="type">char</span>)ch]++;
+      my_total++;
+    }
+  <span class="comment">// iterate through the temp map adding bits * frequency
+</span>  <span class="keyword">for</span> (frequency_map::<span class="type">iterator</span> <span class="variable-name">it</span>=tfreq.begin(); it != tfreq.end(); it++) 
+    {
+      bits += bits_required(it-&gt;first) * it-&gt;second;
+    }
+  <span class="keyword">return</span> bits;
+}
+
+<span class="type">float</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">bits_required</span>(<span class="type">char</span>* <span class="variable-name">fname</span>)
+{
+  <span class="type">ifstream</span> <span class="variable-name">instr</span>(fname);
+  <span class="keyword">return</span> bits_required(instr);
+  instr.close();
+}
+
+<span class="type">float</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">lg</span>(<span class="type">float</span> <span class="variable-name">n</span>) 
+{
+  <span class="keyword">const</span> <span class="type">float</span> <span class="variable-name">log2</span> = log(2.0);
+  <span class="keyword">return</span> log(n)/log2;
+}
+
+<span class="type">float</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">info_value</span>(<span class="type">float</span> <span class="variable-name">n</span>) 
+{
+  <span class="keyword">return</span> -lg(n);
+}
+
+<span class="type">string</span> <span class="type">UnigramTextClassifier</span>::<span class="function-name">ctime_string</span>() 
+{
+  <span class="type">time_t</span> <span class="variable-name">rawtime</span>;
+  <span class="keyword">struct</span> <span class="type">tm</span> * <span class="variable-name">timeinfo</span>;
+  time (&amp;rawtime);
+  timeinfo = localtime(&amp;rawtime);
+  <span class="type">char</span> <span class="variable-name">tmpbuf</span>[128];
+  strftime(tmpbuf,128,<span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>,timeinfo);
+  <span class="keyword">return</span> <span class="type">string</span>(tmpbuf);
+}
+
+</pre>
+  </body>
+</html>

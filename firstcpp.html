@@ -1,0 +1,663 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content=
+"HTML Tidy for Mac OS X (vers 1st July 2002), see www.w3.org">
+<title>Real Quick C++: Beyond "hello world!"</title>
+<link rel="stylesheet" type="text/css" href="realquick.css" title=
+"default">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<div align="right" class="navigation">[Go to <a href=
+"realquickcpp.html#intro">first</a>, <a href=
+"realquickcpp.html">previous</a>, <a href=
+"classesetal.html">next</a> page;&nbsp;<a href=
+"realquickcpp.html">contents]</a></div>
+
+<h1>Beyond "hello world!"</h1>
+
+<p>The traditional first program is to write a program to display
+"hello, world!". There are plenty of tutorials on the web to do
+this, so we won't bother (but feel free to <a href=
+"http://www.google.com/search?q=tutorial+hello+world!+c%2B%2B&amp;ie=UTF-8&amp;oe=UTF-8">
+search Google</a> to find examples).</p>
+
+<p>Instead, we'll write a slightly more complicated program that
+will read text from the standard input console, collect frequencies
+of letters, and then display those frequencies in four columns. For
+example, here's what our program (which we'll dub <b>countch</b>)
+does on a version of Alice in Wonderland:</p>
+
+<pre class="codeBlock">
+<span class="comint-highlight-prompt">%</span> <span class=
+"comint-highlight-input">./countch &lt; alice.txt</span>
+\n      44      \r      44      Space   2155    !       28
+"  77      '       30      (       11      )       11
+,       175     -       29      .       45      :       22
+;       16      ?       15      A       40      B       2
+C       2       D       14      E       7       F       3
+G       1       H       5       I       39      K       1
+L       7       M       5       N       6       O       6
+P       2       R       8       S       9       T       10
+W       10      Z       1       a       640     b       139
+c       167     d       376     e       1075    f       183
+g       201     h       588     i       522     j       6
+k       96      l       410     m       142     n       551
+o       690     p       127     q       6       r       439
+s       506     t       859     u       249     v       68
+w       244     x       6       y       163     z       3
+</pre>
+
+<p>Note that the way we wrote the program, upper case letters are
+distinct from their lower case equivalents and we print out some
+special characters (like the 'newline' character and the Space
+character) to make them easier to read.</p>
+
+<h2>Getting with the program</h2>
+
+Here's the program listing, which I named <a href=
+"countch.cpp"><b>countch.cpp</b></a>: 
+<pre class="codeBlock">
+#<span class="builtin">include</span> <span class=
+"string">&lt;map&gt;</span>
+#<span class="builtin">include</span> <span class=
+"string">&lt;iostream&gt;</span>
+<span class="keyword">using</span> <span class=
+"keyword">namespace</span> <span class="variable-name">std</span>;
+
+<span class="type">int</span> <span class=
+"function-name">main</span>() 
+  {
+  <span class="type">map</span>&lt;<span class=
+"type">char</span>, <span class="type">int</span>&gt; <span class=
+"variable-name">freqs</span>; 
+  <span class="type">char</span> <span class=
+"variable-name">ch</span>;
+  
+  <span class="keyword">while</span> (cin.get(ch))
+    freqs[ch]++;
+ 
+  <span class="type">int</span> <span class=
+"variable-name">i</span>;
+  <span class="type">map</span>&lt;<span class=
+"type">char</span>,<span class="type">int</span>&gt;::<span class=
+"type">iterator</span> <span class="variable-name">it</span>;
+
+  <span class=
+"keyword">for</span> (i=1, it = freqs.begin(); it != freqs.end(); ++it,++i) 
+    {
+    <span class="keyword">switch</span> (it-&gt;first) 
+      {
+      <span class="keyword">case</span> <span class=
+"string">'\r'</span>: cout &lt;&lt; <span class=
+"string">"\\r"</span>; <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class=
+"string">'\t'</span>: cout &lt;&lt; <span class=
+"string">"\\t"</span>; <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class=
+"string">'\n'</span>: cout &lt;&lt; <span class=
+"string">"\\n"</span>; <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class=
+"string">' '</span> : cout  &lt;&lt; <span class=
+"string">"Space"</span>; <span class="keyword">break</span>;
+      <span class=
+"constant">default</span>: cout &lt;&lt; it-&gt;first;
+      }
+    cout &lt;&lt; <span class=
+"string">"\t"</span> &lt;&lt;  it-&gt;second &lt;&lt; ((i%4) ? <span
+ class="string">"\t"</span> : <span class="string">"\n"</span>);
+    }
+  <span class="comment">// cout &lt;&lt; freqs;</span>
+  }
+</pre>
+
+<p>The first thing to note that this program has no classes in it,
+just a function, <span class="function-name">main</span>. C++
+programs don't require the use of classes (as does Java). However,
+as with Java, the <span class="function-name">main</span> function
+is special: it's the function which gets called when the program is
+run.</p>
+
+<p>The second thing to note is that the program isn't very long.
+C++ has an odd reputation for being both overly verbose and overly
+concise. But you can write reasonably clearly written programs in
+C++, and this program is an example. Most of the code handles the
+special cases of hard-to-read characters and putting the results in
+columns.</p>
+
+<h2>Heads up</h2>
+
+<p>Let's examine this code bit by bit. The first section contains
+header inclusions:</p>
+
+<pre class="codeBlock">
+#<span class="builtin">include</span> <span class=
+"string">&lt;map&gt;</span>
+#<span class="builtin">include</span> <span class=
+"string">&lt;iostream&gt;</span>
+<span class="keyword">using</span> <span class=
+"keyword">namespace</span> <span class="variable-name">std</span>;
+</pre>
+
+<div class="callout">What is the Standard Template Library? It is a
+libary with wide variety of useful algorithms and data structures.
+See the section in <a href="learningmore.html">the appendix</a>
+about the STL.</div>
+
+<p>Most C++ programs contain one or more #<span class=
+"builtin">include</span> statements. The #<span class=
+"builtin">include</span> statements tell the program where to find
+the declaration of data types and methods for other C++ modules.
+This program has #<span class="builtin">include</span> <span class=
+"string">&lt;map&gt;</span> statement because we want to use a
+module from the Standard Template Library that allows us to define
+a <span class="type">map</span>: a dictionary of keys to values
+that maintains the keys in sorted order. We'll use this to map
+characters to their frequencies.</p>
+
+<p>We have #<span class="builtin">include</span> <span class=
+"string">&lt;iostream&gt;</span> because this module will allow us
+to read and write to input and output streams, including "standard
+in" and "standard out." In this module, the standard input stream
+is called <span class="variable-name">cin</span>, and the standard
+output stream is called <span class="variable-name">cout</span>
+(for 'console in' and 'console out,' I believe).</p>
+
+<div class="callout">What is a namespace? Namespaces are a data
+structure for keeping names of variables, methods, classes, etc.,
+organized.</div>
+
+<p>The statement <span class="keyword">using</span> <span class=
+"keyword">namespace</span> <span class="variable-name">std</span>;
+allows us to use names from the included files without prefixing
+them with their namespace name. Without this statement, we would
+have to refer to <span class="variable-name">cout</span> as <span
+class="variable-name">std::cout</span>, for example. Different
+programmers make different choices about whether to use the
+standard namespace in this way.</p>
+
+<h2>Remember the <span class="function-name">main</span></h2>
+
+<p>The next section of our program contains the code for our one
+function <span class="function-name">main</span>. As in Java and
+and C, a function is declared by first describing its return type
+(in this case <span class="type">int</span>), then its name (in
+this case <span class="function-name">main</span>), its list of
+arguments (in this case, (), because we don't care about arguments
+that are passed in), and then a block of code that defines the
+function. Again, as in Java and C, blocks of code are defined with
+matching braces.</p>
+
+<p>In other words, if we <i>were</i> writing the "hello, world!"
+program, it would be just:</p>
+
+<pre class="codeBlock">
+#<span class="builtin">include</span> <span class=
+"string">&lt;iostream&gt;</span>
+<span class="type">int</span> <span class=
+"function-name">main</span>() 
+  {
+  std::cout &lt;&lt; <span class="string">"hello world!\n"</span>;
+  }
+</pre>
+
+<p>Ours is slightly more complicated, but not really by much. It
+has two parts. First, the frequency dictionary, <span class=
+"variable-name">freqs</span> is declared, and the input stream is
+read to find the frequencies. Then, we iterate over the frequency
+dictionary writing out the frequencies in four columns. Again, here
+is the code:</p>
+
+<pre class="codeBlock">
+<span class="type">int</span> <span class=
+"function-name">main</span>() 
+  {
+  <span class="type">map</span>&lt;<span class=
+"type">char</span>, <span class="type">int</span>&gt; <span class=
+"variable-name">freqs</span>; 
+  <span class="type">char</span> <span class=
+"variable-name">ch</span>;
+  
+  <span class="keyword">while</span> (cin.get(ch))
+    freqs[ch]++;
+ 
+  <span class="type">int</span> <span class=
+"variable-name">i</span>;
+  <span class="type">map</span>&lt;<span class=
+"type">char</span>,<span class="type">int</span>&gt;::<span class=
+"type">iterator</span> <span class="variable-name">it</span>;
+
+  <span class=
+"keyword">for</span> (i=1, it = freqs.begin(); it != freqs.end(); ++it,++i) 
+    {
+    <span class="keyword">switch</span> (it-&gt;first) 
+      {
+      <span class="keyword">case</span> <span class=
+"string">'\r'</span>: cout &lt;&lt; <span class=
+"string">"\\r"</span>; <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class=
+"string">'\t'</span>: cout &lt;&lt; <span class=
+"string">"\\t"</span>; <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class=
+"string">'\n'</span>: cout &lt;&lt; <span class=
+"string">"\\n"</span>; <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class=
+"string">' '</span> : cout  &lt;&lt; <span class=
+"string">"Space"</span>; <span class="keyword">break</span>;
+      <span class=
+"constant">default</span>: cout &lt;&lt; it-&gt;first;
+      }
+    cout &lt;&lt; <span class=
+"string">"\t"</span> &lt;&lt;  it-&gt;second &lt;&lt; ((i%4) ? <span
+ class="string">"\t"</span> : <span class="string">"\n"</span>);
+    }
+  }
+</pre>
+
+<div class="callout">Common datatypes in C++ include <span class=
+"type">bool</span>, <span class="type">char</span>, <span class=
+"type">int</span>, <span class="type">float</span>, <span class=
+"type">long</span>, and <span class="type">double</span>. Character
+literals are enclosed in single quotes (e.g., 'a'), string literals
+in double quotes (e.g. "test").</div>
+
+<p><span class="type">map</span>&lt;<span class="type">char</span>,
+<span class="type">int</span>&gt; <span class=
+"variable-name">freqs</span>; declares that <span class=
+"variable-name">freqs</span> is a map whose keys are of type <span
+class="type">char</span> and whose values are of type <span class=
+"type">int</span>. We also declare a <span class="type">char</span>
+variable, <span class="variable-name">ch</span>, to use as the key
+to <span class="variable-name">freqs</span>. C++ allows us to get a
+particular value in this map with <span class=
+"variable-name">freqs[ch]</span>. As is often the case with C++,
+the value is initialized to zero; hence, <span class=
+"variable-name">freqs['a']</span> is automatically zero.</p>
+
+<h2>Cin City</h2>
+
+<p>The <span class="keyword">while</span> loop repeatedly class the
+<span class="function-name">get</span> method on <span class=
+"variable-name">cin</span>, the standard input stream. The <span
+class="function-name">get</span> method takes one parameter, a
+character variable. If there is a character on the standard input
+stream, the variable gets that character as its value. If there is
+not, it sets the value of the character to 0. In C++, any non-zero
+value is considered <span class="keyword">true</span>, so we can
+write the very concise while loop:</p>
+
+<pre class="codeBlock">
+  <span class="keyword">while</span> (cin.get(ch))
+    freqs[ch]++;
+</pre>
+
+<div class="callout">In general, <b>x+=2</b> is the same as <b>x=x+2</b>; 
+<b>x++</b> is the same as <b>x+=1</b>; for most purposes, <b>++x</b> is the same as
+<b>x+=1</b>, too, except the return value of this expression is the <i>old</i> value of
+<i>x</i>, not the new value. It's considered by some (not me) to be bad C++ style
+to use <b>i++</b> instead of <b>++i</b> in for loops and the like. 
+</div>
+
+<p>Note that C++ conditions inside <span class=
+"keyword">while</span> loops (as well as <span class=
+"keyword">if</span> conditions) must be enclosed in
+parentheses.</p>
+
+<h2><span class="keyword">For</span>: he's a jolly good fellow</h2>
+
+<p>Because we have a <span class="keyword">map</span> containing
+the character/frequency pairs, we need to iterate over all the keys
+to print out the frequencies. C++ provides iterators for all of the
+collections in the Standard Template Libary. We declare such an
+iterator in our code with:
+
+
+<span class="type">map</span>&lt;<span class=
+"type">char</span>,<span class="type">int</span>&gt;::<span class=
+"type">iterator</span> <span class="variable-name">it</span>;
+</p>
+
+
+<p>Notice that it's just the type definition we used for <span
+class="variable-name">freqs</span>--that is, <span class=
+"type">map</span>&lt;<span class="type">char</span>,<span class=
+"type">int</span>&gt;--with "::<span class="type">iterator</span>"
+appended to it. We also declare <span class="type">int</span> <span
+class="variable-name">i</span>, which we'll use to keep track of
+the column.</p>
+
+<p>Typically, an iterator is initialized by calling the <span
+class="function-name">begin</span>() method on an object, and is
+completed when it is equal to the result of calling the <span
+class="function-name">end</span>() method on an object. The
+<b>++</b> incrementor is used to move the iterator to the next
+"place" in the object. In our case, the object is the <span class=
+"variable-name">freqs</span> map. Thus we see in the for loop:</p>
+
+<pre class="codeBlock">
+ <span class=
+"keyword">for</span> (i=1, it = freqs.begin(); it != freqs.end(); ++it,++i) 
+   { 
+     <i>...code elided...</i> 
+   }
+</pre>
+
+<p>Again, we are counting the columns with <span class=
+"variable-name">i</span>, so that is initialized and incremented as
+well. The general syntax for <span class="keyword">for</span> loops
+is:</p>
+
+<pre class="codeBlock">
+ <span class=
+"keyword">for</span> (<i>initialization</i>; <i>test</i>; <i>increment</i>) 
+   { 
+     <i>code</i> 
+   }
+</pre>
+
+<p>Pay attention to the punctuation: the <i>initialization</i>,
+<i>test</i> and <i>increment</i> are separated by semi-colons, and
+surrounded by parentheses. Individual initialization or increment
+statements (as in our example) are separated by commas. It's all
+boring syntax, but you'll get used to it eventually.</p>
+
+<div class="callout">What's a pointer? See the discussion on <a
+href="memorymgt.html">Memory Management</a>.</div>
+
+<p>Essentially, we want our program to display to the standard
+output the key and value from each entry in the <span class=
+"variable-name">freqs</span> map. Reading the Standard Template
+Library documentation, we learn that each entry is a <span class=
+"type">pair</span> object, and a <span class="type">pair</span>
+object has two publically accessible fields (called "data members"
+in C++): <span class="variable-name">first</span> (which, for <span
+class="type">map</span> objects, holds the key) and <span class=
+"variable-name">second</span> (which holds the value). Iterators
+return pointers to objects, so to access the <span class=
+"variable-name">first</span> and <span class=
+"variable-name">second</span> fields from the current iterator
+pointer, we use <span class="variable-name">it-&gt;first</span> and
+<span class="variable-name">it-&gt;second</span>. If we didn't care
+about columns or printing out special characters, the code would
+look like this:</p>
+
+<pre class="codeBlock">
+  <span class=
+"keyword">for</span> (it = freqs.begin(); it != freqs.end(); it++) 
+    {
+    cout &lt;&lt; it-&gt;first &lt;&lt; <span class=
+"string">"\t"</span> &lt;&lt;  it-&gt;second &lt;&lt; <span class=
+"string">"\n"</span>);
+    }
+</pre>
+
+<p>In fact, this is a very common programming idiom when using
+iterators.</p>
+
+<h2>Cout and about</h2>
+
+<div class="callout">Small exercise: compile and run this program:
+<a href="cat.cpp">cat.cpp</a>.</div>
+
+<p>We'll ignore the details of the <b>&lt;&lt;</b> and
+<b>&gt;&gt;</b> operators here, but notice that we send (the
+printed representation of) data to <span class=
+"variable-name">cout</span> with <b>&lt;&lt;</b>, and we can
+"chain" data to send to <span class="variable-name">cout</span>
+with multiple uses of <b>&lt;&lt;</b>. Data can be sent from <span
+class="variable-name">cin</span> to variables using the
+<b>&gt;&gt;</b> operator; if we wanted to send data from <span
+class="variable-name">cin</span> to a string variable until we
+reached the end of file, we could use this while loop:</p>
+
+<pre class="codeBlock">
+  <span class="type">string</span> <span class=
+"variable-name">str</span>;
+  <span class="keyword">while</span> (cin &gt;&gt; str)
+    {
+    <i>do something with <span class=
+"variable-name">str</span> ...</i>
+    }
+</pre>
+
+<h2><span class="keyword">Switch</span> hitting</h2>
+
+<div class="callout">Some special characters: <span class=
+"string">\n</span> is newline; <span class="string">\r</span> is
+carriage return; <span class="string">\t</span> is tab.</div>
+
+<p>When we send a newline character to <span class=
+"variable-name">cout</span>, naturally a new line is displayed on
+the console. If we want each character/frequency pair on a separate
+line, we need to display some of the special characters in some
+other form. Of course, spaces are not visible, so I've chosen to
+print "Space" instead of a space character. The <span class=
+"keyword">switch</span> construct in C++ allows control choices
+based on the value of some variable. The basic form is:</p>
+
+<pre class="codeBlock">
+  <span class="keyword">switch</span> (<i>variable</i>) 
+    {
+    <span class=
+"keyword">case</span> <i>first_value</i>: <i>do some things</i>; <span
+ class="keyword">break</span>;
+    <span class=
+"keyword">case</span> <i>second_value</i>: <i>do some things</i>; <span
+ class="keyword">break</span>;
+    <i>...</i>
+    <span class=
+"keyword">case</span> <i>nth_value</i>: <i>do some things</i>; <span
+ class="keyword">break</span>;
+    <span class="constant">default</span>: <i>do some things</i>;
+    }
+</pre>
+
+<p>Of special note is the use of <span class="keyword">break</span>
+at the end each case. Without this, control will pass to the next
+<span class="keyword">case</span> statement instead of "breaking
+out" of the <span class="keyword">switch</span> block of code. The
+<span class="keyword">break</span> statement can also be used to
+break out of other code blocks--from within a <span class=
+"keyword">for</span> or <span class="keyword">while</span> loop, as
+common examples.</p>
+
+<h2>Smooth operators</h2>
+
+Most operators in C++ are either unary or binary--that is, they
+take one arguments (like <b>++</b> in <b>++i</b>) or two (like
+<b>=</b> in <b>x=7</b>). C++ (like Java and Javascript) has one
+ternary operation: 
+<pre class="codeBlock">
+     <i>test</i> ? <i>if_true</i> : <i>if_false</i>
+</pre>
+
+<p>The <i>test</i> is executed; if it results in a true (or
+non-zero) value, the code in the <i>if_true</i> block is executed;
+otherwise the code in the <i>if_false</i> block is executed. This
+is the same as <span class="keyword">if</span> <i>test</i>
+<i>if_true</i> <span class="keyword">else</span> <i>if_false</i>,
+but is a little more concise. Some people dislike it for this
+reason, but using it when wanting to embed simple "if/then/else"
+logic seems perfectly reasonable, as we've done in our code:</p>
+
+<pre class="codeBlock">
+    cout &lt;&lt; <span class=
+"string">"\t"</span> &lt;&lt;  it-&gt;second &lt;&lt; ((i%4) ? <span
+ class="string">"\t"</span> : <span class="string">"\n"</span>);
+</pre>
+
+<p>Whenever <b>(i%4)</b> is <i>not</i> zero, we want to output a
+tab character ( <span class="string">"\t"</span>), otherwise we
+want to output a newline character (<span class=
+"string">"\n"</span>). We initialize <span class=
+"variable-name">i</span> to 1, and using "the ternary operator"
+allows us to consisely output values in four columns.</p>
+
+<h2>Runs, comments, and errors</h2>
+
+<p>Finally, our code has one other line, and it's the only line I
+included just for pedagogical reasons:</p>
+
+<pre class="codeBlock">
+  <span class="comment">// cout &lt;&lt; freqs;</span>
+</pre>
+
+<div class="callout">Everything after <span class=
+"comment">//</span> is commented out. Everthing between <span
+class="comment">/*</span> and <span class="comment">*/</span> is a
+comment.</div>
+
+<p>The <span class="comment">//</span> characters introduce a
+comment: everything after this is ignored by the compiler. It's
+possible to imagine that the uncommented line would display all of
+the key/value pairs in <span class="variable">freqs</span> to the
+console (this is what happens in Javascript, for example). But this
+isn't what happens in C++. Instead, I got the following error
+messages (using the g++ compiler):</p>
+
+<pre class="codeBlock">
+countch.cpp: In function `int main()':
+countch.cpp:27: no match for `std::ostream&amp; &lt;&lt; std::map&lt;char, int, 
+   std::less&lt;char&gt;, std::allocator&lt;std::pair&lt;const char, int&gt; &gt; &gt;&amp;' operator
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:55: candidates are: 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(std::basic_ostream&lt;_CharT, 
+   _Traits&gt;&amp;(*)(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;)) [with _CharT = char, 
+   _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:77:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(std::basic_ios&lt;_CharT, 
+   _Traits&gt;&amp;(*)(std::basic_ios&lt;_CharT, _Traits&gt;&amp;)) [with _CharT = char, _Traits 
+   = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:99:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(std::ios_base&amp;(*)(std::ios_base&amp;)) [with _CharT = char, 
+   _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:177:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(long int) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:214:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(long unsigned int) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:152:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(bool) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:104:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(short int) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:115:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(short unsigned int) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:119:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(int) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:130:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(unsigned int) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:240:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(long long int) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:278:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(long long unsigned int) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:304:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(double) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:145:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(float) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:329:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(long double) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:354:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(const void*) [with _CharT = char, _Traits = 
+   std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:120:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; std::basic_ostream&lt;_CharT, 
+   _Traits&gt;::operator&lt;&lt;(std::basic_streambuf&lt;_CharT, _Traits&gt;*) [with _CharT = 
+   char, _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:211:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; 
+   std::operator&lt;&lt;(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;, char) [with _CharT = 
+   char, _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:505:                 
+   std::basic_ostream&lt;char, _Traits&gt;&amp; std::operator&lt;&lt;(std::basic_ostream&lt;char, 
+   _Traits&gt;&amp;, char) [with _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:222:                 
+   std::basic_ostream&lt;char, _Traits&gt;&amp; std::operator&lt;&lt;(std::basic_ostream&lt;char, 
+   _Traits&gt;&amp;, signed char) [with _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:227:                 
+   std::basic_ostream&lt;char, _Traits&gt;&amp; std::operator&lt;&lt;(std::basic_ostream&lt;char, 
+   _Traits&gt;&amp;, unsigned char) [with _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:573:                 
+   std::basic_ostream&lt;_CharT, _Traits&gt;&amp; 
+   std::operator&lt;&lt;(std::basic_ostream&lt;_CharT, _Traits&gt;&amp;, const char*) [with 
+   _CharT = char, _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/bits/ostream.tcc:620:                 
+   std::basic_ostream&lt;char, _Traits&gt;&amp; std::operator&lt;&lt;(std::basic_ostream&lt;char, 
+   _Traits&gt;&amp;, const char*) [with _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:246:                 
+   std::basic_ostream&lt;char, _Traits&gt;&amp; std::operator&lt;&lt;(std::basic_ostream&lt;char, 
+   _Traits&gt;&amp;, const signed char*) [with _Traits = std::char_traits&lt;char&gt;]
+/usr/include/gcc/darwin/3.1/g++-v3/ostream:251:                 
+   std::basic_ostream&lt;char, _Traits&gt;&amp; std::operator&lt;&lt;(std::basic_ostream&lt;char, 
+   _Traits&gt;&amp;, const unsigned char*) [with _Traits = std::char_traits&lt;char&gt;]
+</pre>
+
+<p>Oh my!</p>
+
+<p>It is not unusual to get so much information back from the C++
+compiler, and it takes some familiarity with how C++ works to
+understand what is going on. But the key piece of information--that
+the error occurred in line 27--told me where to look, and it's easy
+to guess that one just can't print a <span class="type">map</span>
+to the console.</p>
+
+<p>Briefly, though, look at the start of the error message
+again:</p>
+
+<pre class="codeBlock">
+countch.cpp: In function `int main()':
+countch.cpp:27: no match for `std::ostream&amp; &lt;&lt; std::map&lt;char, int, 
+   std::less&lt;char&gt;, std::allocator&lt;std::pair&lt;const char, int&gt; &gt; &gt;&amp;' operator
+</pre>
+
+<p>We can see something that looks like our <span class=
+"type">map</span> declaration, and the <span class=
+"type">pair</span> that a <span class="type">map</span> contains.
+This is wrapped inside <b>no match for `std::ostream&amp; &lt;&lt;
+... &gt;&amp;' operator</b>, and this is understandable. It's
+telling us that a <span class="type">map</span> of this type does
+not have the <b>&lt;&lt;</b> operator defined for "std::ostream,"
+which, as you might guess, is the class for output streams (in the
+"std" namespace).</p>
+
+<p>I include this example because it's not uncommon, in learning
+C++, to see reams and reams of syntax error messages like this. It
+doesn't necessarily mean that there are lots and lots of errors in
+your code though--as we've seen, one syntax error here resulted in
+lines and lines of messages.</p>
+
+<div align="right" class="navigation">[Go to <a href=
+"realquickcpp.html#intro">first</a>, <a href=
+"realquickcpp.html">previous</a>, <a href=
+"classesetal.html">next</a> page;&nbsp;<a href=
+"realquickcpp.html">contents]</a></div>
+</body>
+</html>
+

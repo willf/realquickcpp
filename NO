@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='ISO-8859-1' standalone='yes'?>
+<tagfile>
+  <compound kind="file">
+    <name>hamspam.cpp</name>
+    <path>/Users/willfitzgerald/Projects/RealQuickC++/</path>
+    <filename>hamspam_8cpp</filename>
+    <includes id="_unigram_text_classifier_8h" name="UnigramTextClassifier.h" local="yes">UnigramTextClassifier.h</includes>
+    <member kind="function">
+      <type>int</type>
+      <name>main</name>
+      <anchor>a0</anchor>
+      <arglist>(int argc, char *argv[])</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>ilearn.cpp</name>
+    <path>/Users/willfitzgerald/Projects/RealQuickC++/</path>
+    <filename>ilearn_8cpp</filename>
+    <includes id="_unigram_text_classifier_8h" name="UnigramTextClassifier.h" local="yes">UnigramTextClassifier.h</includes>
+    <member kind="function">
+      <type>int</type>
+      <name>main</name>
+      <anchor>a0</anchor>
+      <arglist>(int argc, char *argv[])</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>UnigramTextClassifier.h</name>
+    <path>/Users/willfitzgerald/Projects/RealQuickC++/</path>
+    <filename>_unigram_text_classifier_8h</filename>
+    <namespace>std</namespace>
+  </compound>
+  <compound kind="namespace">
+    <name>std</name>
+    <filename>namespacestd.html</filename>
+    <class kind="class">std::UnigramTextClassifier</class>
+    <member kind="typedef">
+      <type>map&lt; unsigned char, unsigned long &gt;</type>
+      <name>frequency_map</name>
+      <anchor>a0</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>std::UnigramTextClassifier</name>
+    <filename>classstd_1_1_unigram_text_classifier.html</filename>
+    <member kind="function">
+      <type></type>
+      <name>UnigramTextClassifier</name>
+      <anchor>a0</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>UnigramTextClassifier</name>
+      <anchor>a1</anchor>
+      <arglist>(const string classification)</arglist>
+    </member>
+    <member kind="function">
+      <type>frequency_map</type>
+      <name>freqs</name>
+      <anchor>a2</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>unsigned long</type>
+      <name>corpus_total</name>
+      <anchor>a3</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>unsigned long</type>
+      <name>total</name>
+      <anchor>a4</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>string</type>
+      <name>classification</name>
+      <anchor>a5</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>setClassification</name>
+      <anchor>a6</anchor>
+      <arglist>(string &amp;classification)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>UnigramTextClassifier::learn</name>
+      <anchor>a7</anchor>
+      <arglist>(istream &amp;in)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>UnigramTextClassifier::learn</name>
+      <anchor>a8</anchor>
+      <arglist>(char *in)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>UnigramTextClassifier::dump</name>
+      <anchor>a9</anchor>
+      <arglist>(ostream &amp;out)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>UnigramTextClassifier::dump</name>
+      <anchor>a10</anchor>
+      <arglist>(char *out)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>UnigramTextClassifier::read</name>
+      <anchor>a11</anchor>
+      <arglist>(istream &amp;in)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>UnigramTextClassifier::read</name>
+      <anchor>a12</anchor>
+      <arglist>(char *in)</arglist>
+    </member>
+    <member kind="function">
+      <type>float</type>
+      <name>UnigramTextClassifier::score</name>
+      <anchor>a13</anchor>
+      <arglist>(istream &amp;in)</arglist>
+    </member>
+    <member kind="function">
+      <type>float</type>
+      <name>UnigramTextClassifier::score</name>
+      <anchor>a14</anchor>
+      <arglist>(char *in)</arglist>
+    </member>
+    <member kind="function">
+      <type>float</type>
+      <name>UnigramTextClassifier::bits_required</name>
+      <anchor>a15</anchor>
+      <arglist>(unsigned char ch)</arglist>
+    </member>
+    <member kind="function">
+      <type>float</type>
+      <name>UnigramTextClassifier::bits_required</name>
+      <anchor>a16</anchor>
+      <arglist>(istream &amp;in)</arglist>
+    </member>
+    <member kind="function">
+      <type>float</type>
+      <name>UnigramTextClassifier::bits_required</name>
+      <anchor>a17</anchor>
+      <arglist>(char *in)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>float</type>
+      <name>UnigramTextClassifier::lg</name>
+      <anchor>d0</anchor>
+      <arglist>(float n)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>float</type>
+      <name>UnigramTextClassifier::info_value</name>
+      <anchor>d1</anchor>
+      <arglist>(float n)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>string</type>
+      <name>UnigramTextClassifier::ctime_string</name>
+      <anchor>d2</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="variable" protection="protected">
+      <type>frequency_map</type>
+      <name>_freqs</name>
+      <anchor>r0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="protected">
+      <type>unsigned long</type>
+      <name>_corpus_total</name>
+      <anchor>r1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="protected">
+      <type>unsigned long</type>
+      <name>_total</name>
+      <anchor>r2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" protection="protected">
+      <type>string</type>
+      <name>_classification</name>
+      <anchor>r3</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+</tagfile>

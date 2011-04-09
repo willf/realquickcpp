@@ -1,0 +1,112 @@
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{tex2page}
+\usepackage[noend]{algorithmic}
+\usepackage{algorithm}
+\usepackage{amsmath,amsthm}
+\usepackage{xy}
+
+\texonly
+\textwidth = 6 in
+\textheight = 9 in
+\oddsidemargin = 0.0 in
+\evensidemargin = 0.0 in
+\topmargin = 0.0 in
+\headheight = 0.0 in
+\headsep = 0.0 in
+\parskip = 0.1in
+ \parindent = 0.0in
+ \endtexonly
+ 
+ \newcommand {\marginal}[1]{\mbox{}\marginpar{\raggedleft\hspace{0pt}#1}}
+ 
+ \scmkeyword{asm auto bool break case catch char class const const_cast continue default delete do double dynamic_cast else enum explicit export extern false float for friend goto if inline int long mutable namespace new operator private protected public register reinterpret_cast return short signed sizeof static static_cast struct switch template this throw true try typedef typeid typename union unsigned using virtual void volatile wchar_t while map vector}
+
+\cssblock
+.navigation     {font-family: verdana, arial, sans serif; font-style: bold; font-size:11px; line-height:16px}
+\endcssblock
+
+%\htmlmathstyle{no-image}
+\inputcss body.css
+
+\title{Real Quick C++}
+\author{Will Fitzgerald}
+\begin{document}
+\maketitle
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+A delightful and sprightly introduction.
+
+%Broadly construed, my research interests  are in natural language
+%understanding and models of task execution and monitoring. Typically,
+%the approach I take to problems in these domains is to investigate how
+%to integrate symbolic models with statistical, information
+%theoretical, or dynamic data. For example, my dissertation work
+%focused on describing and building natural language parsers that could
+%be quickly incorporated into computer systems \marginal{Are they \textit{interests} or \textit{something else}?\\ See \urlh{http://www.help.com}{the Help.com site}.}such as intelligent
+%tutors and expertise browsers. It described a class of parsing
+%technologies (indexed concept parsing) which combined
+%information-theoretic and knowledge-based approaches to natural
+%language understanding. Several systems based on indexed concept
+%parsing have been commercially developed and are in use for web-based
+%knowledge management and for tutoring. 
+
+%\begin{verbatim}
+% (define fact 
+%   (lambda (n)
+%     (if (= n 0)
+%         1 ; the base case
+%         (* n (fact (- n 1))))))
+%\end{verbatim}
+%                   
+%Since 1996, my colleague R. James Firby and I have been investigating
+%and building systems that integrate natural language understanding and
+%generation, task execution, and recognition of complex event
+%patterns. In several NASA SIBIR (Small Business Innovation Research)
+%projects, as well as part of a commercial R\&D effort, we have worked
+%on representations and algorithms for conceptual memory storage and
+%querying, semantically-oriented natural language understanding, and
+%dialogue and task execution. This work has resulted in several
+%commercial applications for automotive telematics, network and system
+%monitoring, and is actively used at NASA's Johnson Space Center for
+%several projects. 
+
+%I have been interested in investigating the similarities and
+%differences between event recognition and monitoring, and natural
+%language understanding. I have created a language for events and event
+%pattern recognition that incorporates ideas from  natural language
+%parsing which takes into account the multi-channel and often
+%non-serial nature of events, while incorporating the hierarchical and
+%serial nature of language.  
+
+%\scm{
+%(define fact
+%"The factorial function"
+% (lambda (n)
+%     (if (= n 0) 1 ;the base case
+%        (* n (fact (- n 1))))))
+%}
+
+%These interests have led to ancillary interests in programming
+%languages (both as a tool user and a tool design), operating systems
+%and distributed computing, cognitive science, linguistics and
+%philosophy of language. I am also interested in ``humane computing,''
+%that is, the interaction between computational devices and approaches,
+%and people and how this should inform design of computational devices.  
+
+\newpage
+\include{firstcpp}
+%Oddly, this has led me to write code that looks like:
+%\scm{
+%#include <iostream> %using namespace std;
+%// an 'enum' is a list of values
+%;; Wish I could change the quoting ... but an enum is still a list of values%enum SignalValueType 
+% {SignalCharacter, SignalInteger, SignalDouble, SignalLong, SignalBoolean}; %class Signal {%public:%  Signal() {%    theType = SignalInteger;%    ti = 0;%  }%  Signal(int i) {%    theType = SignalInteger;%    ti = i;%  }%  Signal(char ch) {%    theType = SignalCharacter;%    tch = ch;%  }%  Signal(double d) {%    theType = SignalDouble;%    td = d;%  }%  Signal(long l) {%    theType = SignalLong;%    tl = l;%  }%  Signal(bool b) {%    theType = SignalBoolean;%    tb = b;%  }%  bool equals(const Signal& probe) {%    switch (theType) {%    case SignalInteger: %      return (probe.theType==SignalInteger) && (probe.ti==ti);%    case SignalCharacter: %      return (probe.theType==SignalCharacter) && (probe.tch==tch);%    case SignalDouble: %      return (probe.theType==SignalDouble) && (probe.td==td);%    case SignalLong: %      return (probe.theType==SignalLong) && (probe.tl==tl);%    case SignalBoolean: %      return (probe.theType==SignalBoolean) && (probe.tb==tb);%    default: return 0;%    };%  };%private:%  SignalValueType theType;%  union {%    char tch;%    int ti;%    double td;%    long tl;%    bool tb;%  };%};%int main()%{%  Signal s = Signal();%  int ii= 0;%  Signal s1 = Signal(ii);%  Signal bs = Signal(true);%  cout << "Self similar: " << s1.equals(s1) << "\n";%  cout << "Same value: " << s.equals(s1) << "\n";%  cout << "Int is bool " << s1.equals(bs) << "\n";%} % 
+%}
+
+\end{document}

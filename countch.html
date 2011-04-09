@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!-- Created by htmlize-0.67 in css mode. -->
+<html>
+  <head>
+    <title>countch.cpp</title>
+    <style type="text/css">
+    <!--
+      body {
+        color: #000000;
+        background-color: #ffffff;
+      } /* default */
+      .comment {
+        color: #b22222;
+        background-color: #ffffff;
+      } /* font-lock-comment-face */
+      .constant {
+        color: #5f9ea0;
+        background-color: #ffffff;
+      } /* font-lock-constant-face */
+      .function-name {
+        color: #0000ff;
+        background-color: #ffffff;
+      } /* font-lock-function-name-face */
+      .type {
+        color: #228b22;
+        background-color: #ffffff;
+      } /* font-lock-type-face */
+      .variable-name {
+        color: #b8860b;
+        background-color: #ffffff;
+      } /* font-lock-variable-name-face */
+      .keyword {
+        color: #a020f0;
+        background-color: #ffffff;
+      } /* font-lock-keyword-face */
+      .string {
+        color: #bc8f8f;
+        background-color: #ffffff;
+      } /* font-lock-string-face */
+      .builtin {
+        color: #da70d6;
+        background-color: #ffffff;
+      } /* font-lock-builtin-face */
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+    <pre>
+#<span class="builtin">include</span> <span class="string">&lt;map&gt;</span>
+#<span class="builtin">include</span> <span class="string">&lt;iostream&gt;</span>
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="variable-name">std</span>;
+
+<span class="type">int</span> <span class="function-name">main</span>() {
+  <span class="type">map</span>&lt;<span class="type">char</span>, <span class="type">int</span>&gt; <span class="variable-name">freqs</span>; 
+  <span class="type">char</span> <span class="variable-name">ch</span>;
+  
+  <span class="keyword">while</span> (cin .get(ch))
+    freqs[ch]++;
+ 
+  <span class="type">int</span> <span class="variable-name">i</span>;
+  <span class="type">map</span>&lt;<span class="type">char</span>,<span class="type">int</span>&gt;::<span class="type">iterator</span> <span class="variable-name">it</span>;
+
+  <span class="keyword">for</span> (i=1, it = freqs.begin(); it != freqs.end(); ++it,++i) {
+    <span class="keyword">switch</span> (it-&gt;first) 
+      {
+      <span class="keyword">case</span> <span class="string">'\r'</span>: cout &lt;&lt; <span class="string">&quot;\\r&quot;</span>; <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class="string">'\t'</span>: cout &lt;&lt; <span class="string">&quot;\\t&quot;</span>; <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class="string">'\n'</span>: cout &lt;&lt; <span class="string">&quot;\\n&quot;</span>; <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class="string">' '</span> : cout  &lt;&lt; <span class="string">&quot;Space&quot;</span>; <span class="keyword">break</span>;
+      <span class="constant">default</span>: cout &lt;&lt; it-&gt;first;
+    }
+    
+    cout &lt;&lt; <span class="string">&quot;\t&quot;</span> &lt;&lt;  it-&gt;second &lt;&lt; ((i%4) ? <span class="string">&quot;\t&quot;</span> : <span class="string">&quot;\n&quot;</span>);
+  }
+  <span class="comment">// cout &lt;&lt; freqs;
+</span>}
+</pre>
+  </body>
+</html>

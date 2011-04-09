@@ -1,0 +1,8 @@
+
+HTML Tidy for Mac OS X (vers 1st July 2002; built on 07/07/02, at 23:30:33)
+Parsing "learningmore.html"
+
+learningmore.html: Doctype given is "-//W3C//DTD HTML 4.01//EN"
+learningmore.html: Document content looks like HTML 4.01 Transitional
+No warnings or errors were found.
+

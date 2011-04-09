@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!-- Created by htmlize-0.67 in css mode. -->
+<html>
+  <head>
+    <title>Makefile&lt;2&gt;</title>
+    <style type="text/css">
+    <!--
+      body {
+        color: #000000;
+        background-color: #ffffff;
+      } /* default */
+      .constant {
+        color: #5f9ea0;
+        background-color: #ffffff;
+      } /* font-lock-constant-face */
+      .function-name {
+        color: #0000ff;
+        background-color: #ffffff;
+      } /* font-lock-function-name-face */
+      .variable-name {
+        color: #b8860b;
+        background-color: #ffffff;
+      } /* font-lock-variable-name-face */
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+    <pre>
+<span class="variable-name">CC</span> = g++
+<span class="variable-name">CFLAGS</span> = -Wall -g
+
+<span class="function-name">all</span>:	ilearn hamspam
+
+<span class="function-name">UnigramTextClassifier.o</span>:	UnigramTextClassifier.h UnigramTextClassifier.cpp
+	$(<span class="constant">CC</span>) $(<span class="constant">CFLAGS</span>) -c UnigramTextClassifier.cpp
+
+<span class="function-name">ilearn</span>:	UnigramTextClassifier.o ilearn.cpp
+	$(<span class="constant">CC</span>) $(<span class="constant">CFLAGS</span>) UnigramTextClassifier.o ilearn.cpp -o ilearn
+
+<span class="function-name">hamspam</span>:	UnigramTextClassifier.o hamspam.cpp
+	$(<span class="constant">CC</span>) $(<span class="constant">CFLAGS</span>) UnigramTextClassifier.o hamspam.cpp -o hamspam
+
+<span class="function-name">clean</span>:
+	rm -f core *.o *~
+
+<span class="function-name">doc</span>:	UnigramTextClassifier.h doxygen.cfg
+	doxygen doxygen.cfg</pre>
+  </body>
+</html>

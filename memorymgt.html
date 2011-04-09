@@ -1,0 +1,230 @@
+<html>
+
+<head>
+<title>
+Real Quick C++: Memory Management and all that
+</title>
+<link rel="stylesheet" type="text/css" href="realquick.css" title=default>
+<meta name=robots content="index,follow">
+</head>
+<body>
+
+<div align="right" class="navigation">[Go to <a href="realquickcpp.html#intro">first</a>, <a href="firstcpp.html">previous</a>, <a href="learningmore.html">next</a> page;&nbsp;<a href="realquickcpp.html">contents]</a></div>
+
+<h1>Real Quick C++ : Memory Management and all that</h1>
+
+<p>With two programs under our belts, we are practically C++
+  experts. But there's more to learn. We need to discuss how to create
+  classes that are derived from other classes, pointers and
+  references, and memory management.
+
+<h2>My fine inheritance</h2>
+
+<p>In the <a href="classesetal.html">Unigram text classifier
+    example</a>, we created one class which did not inherit from
+    other classes. Given the way it was written, we could not create
+    other classes that could inherit from it. We could have written
+    our code so this was the case, of course.
+
+<p>For example, we might have created a more
+  general <b>TextClassifier</b> class from which
+  our <b>UnigramTextClassifier</b>. Here's a sketch of what
+  the <b>TextClassifier</b> header would look like:
+
+<pre class="codeBlock">
+#<span class="builtin">ifndef</span> <span class="variable-name">TextClassifier_H</span>
+#<span class="builtin">define</span> <span class="variable-name">TextClassifier_H</span>
+#<span class="builtin">include</span> <span class="string">&lt;map&gt;</span>
+#<span class="builtin">include</span> <span class="string">&lt;iostream&gt;</span>
+#<span class="builtin">include</span> <span class="string">&lt;fstream&gt;</span>
+<span class="type">namespace</span> <span class="variable-name">TextClassifier</span> 
+{
+  class TextClassifier 
+  {
+  <span class="constant">public</span>:
+
+    TextClassifier();
+    TextClassifier(<span class="keyword">const</span> string classification);
+
+    <span class="type">unsigned</span> <span class="type">long</span> <span class="function-name">corpusTotal</span>() { <span class="keyword">return</span> my_corpus_total; }
+    <span class="comment">/* ... etc ... */</span>
+    virtual <span class="type">void</span> <span class="variable-name">TextClassifier</span>::learn(istream&amp; in) =0;
+
+    virtual <span class="type">float</span> <span class="variable-name">TextClassifier</span>::score(istream&amp; in); 
+    <span class="comment">/* ... etc ... */</span>
+  <span class="constant">private</span>:
+    <span class="comment">/*! internal total number of characters in corpus */</span>
+    <span class="type">unsigned</span> <span class="type">long</span> <span class="variable-name">_corpus_total</span>;
+    <span class="comment">/* ... etc ... */</span>
+  };
+}
+<span class="type">using</span> namespace <span class="variable-name">std</span>;
+#<span class="builtin">endif</span> <span class="comment">/* TextClassifier_H */</span>
+</pre>
+
+<p>Methods that may be overridden are introduced with 
+<span class="keyword">virtual</span>, as in the definition of 
+<span class="function-name">score</span>. Methods that <b>must</b> be
+defined (like Java's interfaces) are given a 'null' definition by 
+defining them as <b>=0</b>,   as in the definition of 
+<span class="function-name">learn</span>. 
+
+<p>To create a subclass (a 'derived class,' in C++ jargon), you
+declare it with after the <span class="keyword">class</span>
+section. Here's an example of what the header for
+UnigramTextClassifier might look like:
+
+<pre class="codeBlock">
+#<span class="builtin">ifndef</span> <span class="variable-name">UnigramTextClassifier_H</span>
+#<span class="builtin">define</span> <span class="variable-name">UnigramTextClassifier_H</span>
+#<span class="builtin">include</span> <span class="string">"TextClassifier.h"</span>
+<span class="type">namespace</span> <span class="variable-name">TextClassifier</span> 
+{
+  class UnigramTextClassifier : public TextClassifier 
+  {
+  <span class="constant">public</span>:
+
+    <span class="comment">/* ... etc ... */</span>
+
+  <span class="constant">private</span>:
+
+    <span class="comment">/* ... etc ... */</span>
+  };
+}
+<span class="type">using</span> namespace <span class="variable-name">std</span>;
+<span class="type">using</span> namespace <span class="variable-name">TextClassifier</span>;
+#<span class="builtin">endif</span> <span class="comment">/* UnigramTextClassifier_H */</span>
+</pre>
+
+<p>C++ allows for multiple inheritance of classes (that is, a class
+can be derived from more than one class).
+
+<h2>What's the point?</h2>
+
+<p>No discussion of C++ would be helpful without some discussion of
+pointers and references. As we all know, variables have to be stored
+somewhere in memory, although typically, we think of a variable in
+terms of its <i>value</i> and not its <i>location</i>. A pointer is
+simply a variable whose <i>value</i> is a <i>location</i>.
+
+<p>Why do we need to know about pointers? C++ requires us to
+constantly consider whether we are dealing with a value or a pointer.
+
+<p>For example, consider the following statements (perhaps from a text
+classification program):
+
+<pre class="codeBlock">
+    UnigramTextClassifier ut1 = UnigramTextClassifier();
+    UnigramTextClassifier ut2 = ut1;
+</pre>
+
+<p>In many languages ut1 and ut2 would point to the same value. C++,
+on the other hand, has a "copy-by-value" semantics, so ut1 and ut2
+are <i>different objects</i>. Similarly,  consider a function such as:
+
+<pre class="codeBlock">
+  <span class="type">void</span> <span class="function-name">test</span>(UnigramTextClassifier ut) { } 
+</pre>
+
+<p>The <span class="function-name">test</span> function would receive
+a <i>copy</i> of the object passed to it ("pass-by-value").
+
+<p>Although at times this may be what we want, it is often <i>not</i>
+what we want, and so we need pointers instead (and, we'll see, references). 
+
+<p>Pointers to objects (including the built-in types, such as <span
+class="keyword">int</span>s and arrays) are declared using a "*". So, our code block above becomes:
+
+<pre class="codeBlock">
+    UnigramTextClassifier  ut = UnigramTextClassifier();
+    UnigramTextClassifier* put = &amp;ut;
+</pre>
+
+<p>Now, <span class="variable-name">put</span> is a pointer to <span
+class="variable-name">ut</span>, and, in some sense they "point to the
+same thing." To change the value of what <span
+class="variable-name">put</span> points to, we use <b>*put= ...</b>. 
+
+<p>The <b>&amp;</b> means "address of". 
+
+<p>The syntax for accessing methods and fields differs for 'regular'
+variables and 'pointer' variables. For regular variables, one appends
+the field or method with a "dot." For pointers, one uses "->" (which
+is just a bit of syntactic sugar; <b>x->y</b> is the same
+as <b>(*x).y</b>). For example:
+
+<pre class="codeBlock">
+    UnigramTextClassifier  ut = UnigramTextClassifier();
+    UnigramTextClassifier* put = &amp;ut;
+    cout << ut.classification() << "; " << put->classification() << endl;
+</pre>
+
+<p>Sigh, it's all very confusing, and you need to pay careful
+attention. Of course, the compiler will often catch errors for you. 
+
+<p>C++ also allows us to use <b>&amp;</b> to declare reference
+variables, using the <b>&amp;</b> for this. This is especially useful
+in writing functions and methods, and allow us to pass objects "by
+reference" instead of "by value." Again, a short example:
+
+<pre class="codeBlock">
+    <span class="type">void</span> <span class="function-name">test</span>(UnigramTextClassifier&amp; ut, UnigramTextClassifier* put)
+    {
+      cout << ut.classification() << "; " << put->classification() << endl;
+    }
+</pre>
+
+<p>Note that variables passed by reference use the 'dotted' syntax for access. The classic "swap" routine is:
+
+<pre class="codeBlock">
+    <span class="type">void</span> <span class="function-name">swap</span>(<span class="type">int</span>&amp; i, <span class="type">int</span>&amp; j) { <span class="type">int</span> <span class="variable-name">temp</span>=i; i=j; j=temp; }
+</pre>
+ 
+
+<h2>Misty water-colored memory management</h2>
+
+<p>Memory which is dynamically allocated in C++ is not automatically
+"garage-collected," and the programmer must carefully manage deleting
+dynamically allocated variables. Objects are dynamically created using the 
+<span class="keyword">new</span> keyword, and dynamically deleted using the
+<span class="keyword">delete</span> keyword. Also, 
+<span class="keyword">new</span> objects are returned as
+pointers. There are (at least) three strategies for dealing with memory
+management. The first strategy is to carefully pair any call to <span
+class="keyword">new</span> with a call to <span
+class="keyword">delete</span>, which ensuring any additional
+references to the <span class="keyword">new</span> objects are set to
+"null" (0). For example:
+
+<pre class="codeBlock">
+<span class="type">void</span> <span class="function-name">test</span>() 
+    { 
+      UnigramTextClassifier* put1 = new UnigramTextClassifier();
+      UnigramTextClassifier* put2 = put1;
+      <span class="comment">/* do some stuff */</span>
+      cout << put1->classification();
+      <span class="comment">/* do some stuff */</span>
+      delete put1;
+      put2 = 0;
+    }
+</pre>
+
+<p>The second strategy is to use a programming idiom called "resource
+acquisition is initialization." C++ allows one to
+define <i>destructors</i> as well as <i>constructors</i> and
+these can be written so that memory is returned at the end of a code block, 
+even in the face of exceptions. Again, this is beyond the scope of this
+tutorial, but a <a href="http://www.google.com/search?as_q=&num=10&hl=en&ie=UTF-8&oe=UTF-8&btnG=Google+Search&as_epq=resource+acquisition+is+initialization">Google search for "resource
+acquisition is initialization"</a> will take you futher. (See, for example,
+Stroustrup's answer to the question <a href="http://www.research.att.com/~bs/bs_faq2.html#finally">Why doesn't C++ provide a "finally" construct?</a>).
+
+
+<p>The third strategy is to use a language that provides automatic
+garbage collection (including some implementations of C++). (I'm just
+being snarky here).
+
+
+<div align="right" class="navigation">[Go to <a href="realquickcpp.html#intro">first</a>, <a href="firstcpp.html">previous</a>, <a href="learningmore.html">next</a> page;&nbsp;<a href="realquickcpp.html">contents]</a></div>
+
+</body>
+</html>

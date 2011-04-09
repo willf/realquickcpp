@@ -1,0 +1,60 @@
+body {font-family: verdana, arial, sans serif; font-size:14px; line-height:18px }
+code, pre { font-family: "courier new", "courier";font-size:12px; line-height:14px }
+h1 {font-weight:bold; font-family: verdana, arial, sans serif; font-size:14px; line-height:18px}
+h2 {font-weight:bold; font-family: verdana, arial, sans serif; font-size:12px; line-height:18px}
+h3, h4, h5, h6 { font-weight:bold; font-family: verdana, arial, sans serif; font-size:11px; line-height:16px}
+a {text-decoration:none; border-width: 0px 0px 1px 0px;border-style: none none dotted none;}
+.comment {
+  color: #b22222;
+} /* font-lock-comment-face */
+.constant {
+  color: #5f9ea0;
+  
+} /* font-lock-constant-face */
+.function-name {
+  color: #0000ff;
+  
+} /* font-lock-function-name-face */
+.type {
+  color: #228b22;
+  
+} /* font-lock-type-face */
+.variable-name {
+  color: #b8860b;
+  
+} /* font-lock-variable-name-face */
+.keyword {
+  color: #a020f0;
+  
+} /* font-lock-keyword-face */
+.string {
+  color: #bc8f8f;
+  
+} /* font-lock-string-face */
+.builtin {
+  color: #da70d6;
+  
+} /* font-lock-builtin-face */
+.comint-highlight-prompt {
+  color: #00008b;
+  
+} /* comint-highlight-prompt */
+.codeBlock { 
+background-color: #eeeeee; 
+margin-left: 30px; 
+margin-right: 30px; 
+padding: 5pt }
+div.callout {
+font-size: 11px;
+text-align:left;
+color: #000000; 
+padding:10px;
+background-color: #dddddd; 
+float: right; 
+top: 425;
+left:400px;
+width:150px; 
+overflow: auto}
+.navigation     {font-family: verdana, arial, sans serif; font-style: bold; font-size:11px; line-height:16px}
+.colophon { color: gray;font-size: 80%; text-align: right;  }
+.colophon a {color: gray; }

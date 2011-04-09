@@ -1,0 +1,51 @@
+From will.fitzgerald@kzoo.edu Fri Sep 13 08:48:25 2002
+Date: Fri, 13 Sep 2002 08:48:25 -0400
+Subject: Re: is today your first official day at k'zoo college?
+Content-Type: text/plain;
+	charset=US-ASCII;
+	format=flowed
+Mime-Version: 1.0 (Apple Message framework v543)
+From: Will Fitzgerald <will.fitzgerald@kzoo.edu>
+To: Michael Hannemann <hannemann@inetmi.com>
+Content-Transfer-Encoding: 7bit
+In-Reply-To: <5.1.0.14.2.20020912152128.02853018@mail.inetmi.com>
+Message-Id: <17FBC2A8-C717-11D6-AF87-000393B66774@kzoo.edu>
+X-Mailer: Apple Mail (2.543)
+
+
+On Thursday, September 12, 2002, at 04:24 PM, Michael Hannemann wrote:
+
+>
+>> At least my new Mac is working...I loved your picture of CI running 
+>> on OS X. I'm looking forward to getting it to work for me, too!
+>
+> Bob was happy -- there's a bit of Java code he's put into all of his 
+> apps which is supposed to grab and use the default look 'n feel, but 
+> that he's never actually had an opportunity to test before because 
+> he's only programmed on Windows machines.  This showed that it worked. 
+> =)
+>
+>> Yes, today is the day. I'm writing this from my office. I had a 
+>> teaching workshop all day, which was a bit daunting. It seems like a 
+>> very new thing to be doing...
+>
+> It is!  Hopefully you didn't have the same sort of workshop a friend 
+> of mine who just started teaching elementary school in Willamette had, 
+> of the "beware the parents, because they want nothing but the best for 
+> their kids, and you are no obstacle" sort.  I'd say I was joking, 
+> except there seemed to be _many_ days of "how to deal with parents" 
+> lectures.  You shouldn't have anything like that, I'd think.
+>
+> When does school start, and are you teaching any classes other than 
+> the Intro to Programming one?
+>
+
+Well, actually, they did have a warning about parents--out of something 
+like 80 calls about residency issues this year, all but 2 came from 
+parents. It seems that parents are much more active in 'getting their 
+money's worth' these days (K is the most expensive school in Michigan).
+
+I'm actually teaching Principles of Programming Languages, and 
+supervising a 'senior independent project' seminar.
+
+Will
